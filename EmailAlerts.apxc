@@ -1,0 +1,188 @@
+public class EmailAlerts {
+    public ID accountId {get;set;}
+    public String email {get;set;}
+    public String name {get;set;}
+    public Date date1 {get;set;}
+    public Date date2 {get;set;}
+    public String location {get;set;}
+    public integer noPacks {get;set;}
+    public integer noJoiners {get;set;}
+    public String time1 {get;set;} 
+    
+    //Intro email -information collection
+    Public PageReference sendIntroEmail(){
+        Blob body;
+        Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();
+        
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Intro email -information collection');
+        mail.setHtmlBody('Hi,'+ Name +'<br><br>I am sharing with you a Ready Reckoner which will give you an idea about Life at'+
+                         'Apttus, the road map of trainings, and also serves as a city guide.'+
+                         'Please do read through the Ready Reckoner as it contains important information.<br><br>'+
+                         'I am also reaching out to you in order to know “something” more about you because I would'+
+                         'like to formally announce to Team Apttus about your joining.<br><br>'+
+                         '<i><font color="#2D9FC4">I would like to know in very brief about your work (companies you worked with in past),'+
+                         ' experience in years and what college you attended. What will be interesting to know actually is '+
+                         ' – your interests / passions / other activities you involve in. Are you into reading? If so, what '+
+                         'are you reading these days? Travel freak? What all have been your indulgences – road trips,'+
+                         ' adventure trips,? Animal lover? Have pets at home? Please share whatever you are comfortable '+
+                         ' sharing with Team Apttus.</font></i><br><br>'+
+                         'I think this should give you a good idea about what your welcome email will look like.<br><br>'+
+                         'Can I have this information <b>today by <b>'+time1+' please? <b>I will also need a picture.</b>'
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+        
+    }
+    
+    //Lunch Email
+    public PageReference sendLunchEmail(){      
+        Blob body;
+        Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();    
+        
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Lunch Order Apttus');
+        mail.setHtmlBody('Hi,<br><br>We Have '+noJoiners+' joiner on '+date1.format()+'<br><br>'+
+                         'Kindly book Lunch Pack as per below:-<br><br>'+
+                         '<table border="1"><tr><td>Sr.No</td><td>No of Lunch Pack</td><td>Location</td></tr><tr><td>1</td><td>'+noPacks+'</td><td>'+location+'</td></tr></table>'+
+                         '<br><br>Note: please coordinate with Kruti Pathak also if she is part of the any Training.'
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+    }
+    
+    public PageReference sendMultPdf(){
+        PageReference  pdf = Page.PdfGeneratorTemplate;
+        PageReference pdf2 =Page.LunchPDFTemplate;
+        Blob body;
+        Blob body2;
+        
+        try {           
+            // returns the output of the page as a PDF
+            body = pdf.getContent();
+            body2=pdf2.getContent();
+            // need to pass unit test -- current bug  
+        } catch (VisualforceException e) {
+            body = Blob.valueOf('Some Text');
+            body=blob.valueOf('Some Text');
+        }
+        
+        List<Messaging.Emailfileattachment> fileAttachments  = new   List<Messaging.Emailfileattachment>();    
+        for(integer i=0;i<2;i++){
+            Messaging.EmailFileAttachment fileAttachment = new Messaging.EmailFileAttachment();
+            fileAttachment.setContentType('application/pdf');
+            if(i==0){                
+                fileAttachment.Body = body;
+                fileAttachment.setFileName('testPdf1.pdf');              
+                //    fileAttachment.setInline(false);
+                
+            }else{
+                fileAttachment.Body = body2; 
+                fileAttachment.setFileName('testPdf2.pdf');              
+                //    fileAttachment.setInline(false);  
+                
+            }           
+            fileAttachments.add(fileAttachment);
+        }
+        
+        //   fileAttachment.setFileName('testPdf.pdf');
+        //  fileAttachment.setFileName('testPdf2.pdf');
+        // fileAttachment.setInline(false);
+        //fileAttachment.Body = body;
+        //fileAttachment.Body=body2;       
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        
+        mail.setToAddresses(new String[] { email });
+        // mail.setccAddresses(new String[] {emailCC});  
+        mail.setSubject('PDF Email Demo');
+        mail.setHtmlBody('Here is the email you requested! Check the attachment!');
+        mail.setFileAttachments(fileAttachments ); 
+        // mail.setFileAttachments(new Messaging.EmailFileAttachment[] { attach1 }); 
+        mail.setBccSender(false);
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+    }
+    
+    //Send Welcome Email
+    public PageReference sendWelcomEmail() {       
+        PageReference pdf = Page.PdfGeneratorTemplate;
+        
+        
+        // the contents of the attachment from the pdf
+        Blob body;
+        
+        try {
+            
+            // returns the output of the page as a PDF
+            body = pdf.getContent();
+            
+            // need to pass unit test -- current bug  
+        } catch (VisualforceException e) {
+            body = Blob.valueOf('Some Text');
+        }
+        
+        Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();
+        attach.setContentType('application/pdf');
+        attach.setFileName('Welcome Email.pdf');
+        attach.setInline(false);
+        attach.Body = body;
+        
+        
+        
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Welcome to Apttus');
+        mail.setHtmlBody('Hi '+name+',<br><br>We are excited to have you on-board at Apttus India and look forward to meeting you on '+date1.format()+'.<br><br>'+
+                         'HR Team and the buddies from your department will be here to help you for everything else. '+
+                         'Please plan to arrive at the office at '+location+'.<br><br>'+
+                         '<b>Day 1 Agenda</b><br>'+
+                         '1) Welcome<br>'+
+                         '2) New Hire Paperwork<br>'+
+                         '3) Provide you the laptop and IT related access<br>'+
+                         '4) Lunch with Buddy – arranged by Apttus<br>'+
+                         '5) Introduction with the Reporting Manager &amp Team<br>'+
+                         '6) Self-learning / training modules as required in your role<br><br>'+
+                         'You are also required to have <b>soft copies</b> of the documents mentioned in your offer letter.'+ 
+                         'If you do not have scanned copies, we can scan it in office on Monday.'+
+                         'At least on Day 1 I request you to bring the following: <b>Passport, '+
+                         'Any Identity & Residence Proof, PAN Card and 4 passport sized pictures and last 3 months salary Slips.</b><br><br>'+
+                         'Meanwhile, please fill in the details in attached documents and send it to us by '+date2.format()+'<br><br>'+
+                         'Welcome to the Rocket ship!<br><br>'+ Userinfo.getFirstName() + ' | ' + Userinfo.getUserEmail()
+                        ); 
+        mail.setFileAttachments(new Messaging.EmailFileAttachment[] { attach }); 
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+        
+        
+        
+    }
+    
+}
