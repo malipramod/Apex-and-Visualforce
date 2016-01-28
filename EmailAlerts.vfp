@@ -1,0 +1,135 @@
+<apex:page controller="EmailAlerts" docType="HTML-5.0">  
+    <apex:tabPanel switchType="client" selectedTab="tabdetail" id="email" >
+        
+        <!-- Welcome Email -->
+        <apex:tab label="Send Welcome Email" name="welcomeEmail">
+            <apex:sectionHeader title="Send Welcome Email with attachments"/>            
+            <apex:form >
+                <apex:pageMessages />
+                <apex:pageBlock title="PDF Input">            
+                    <apex:pageBlockButtons >
+                        <apex:commandButton action="{!sendWelcomEmail}" value="Send PDF"/>
+                    </apex:pageBlockButtons>            
+                    <apex:pageBlockSection >
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Name" for="name"/>
+                            <apex:inputText value="{!name}" id="name"/>            
+                        </apex:pageBlockSectionItem>     
+
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Email to be send" for="email"/>
+                            <apex:inputText value="{!email}" id="email"/>            
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Date" for="date1"/>
+                            <apex:input type="date" value="{!date1}"/>
+                        </apex:pageBlockSectionItem>
+                        
+                         <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Form Filling Date" for="date2"/>
+                            <apex:input type="date" value="{!date2}"/>
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Location" for="location"/>
+                            <apex:inputText value="{!location}" id="location"/>            
+                        </apex:pageBlockSectionItem>                         
+                    </apex:pageBlockSection> 
+                    
+                    
+                </apex:pageBlock>
+            </apex:form> 
+        </apex:tab>
+
+        <!--Intro Email and Information Collection -->
+        <apex:tab label="Send Intro Email and Information collection" name="introEmail" >
+        	<apex:sectionHeader title="Send Intro Email"/>            
+            <apex:form >
+                <apex:pageMessages />
+                <apex:pageBlock title="Intro Email">            
+                    <apex:pageBlockButtons >
+                        <apex:commandButton action="{!sendIntroEmail}" value="Send Intro Email"/>
+                    </apex:pageBlockButtons>            
+                    <apex:pageBlockSection >                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Email to be send" for="email"/>
+                            <apex:inputText value="{!email}" id="email"/>            
+                        </apex:pageBlockSectionItem>                         
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Name" for="name"/>
+                            <apex:inputText value="{!name}" id="name"/>            
+                        </apex:pageBlockSectionItem> 
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Before time" for="beforetime"/>
+                            <apex:inputText value="{!time1}" id="name"/>            
+                        </apex:pageBlockSectionItem>   
+                    </apex:pageBlockSection>     
+                </apex:pageBlock>
+            </apex:form>
+        </apex:tab>
+        
+        
+        <!-- Lunch Email -->
+        <apex:tab label="Send Lunch Email" name="lunchEmail" >
+        	<apex:sectionHeader title="Send Lunch Email"/>            
+            <apex:form >
+                <apex:pageMessages />
+                <apex:pageBlock title="PDF Input">            
+                    <apex:pageBlockButtons >
+                        <apex:commandButton action="{!sendLunchEmail}" value="Send PDFs"/>
+                    </apex:pageBlockButtons>            
+                    <apex:pageBlockSection >                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Email to be send" for="email"/>
+                            <apex:inputText value="{!email}" id="email"/>            
+                        </apex:pageBlockSectionItem> 
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Number of joiner" for="noJoiner"/>
+                            <apex:inputText value="{!noJoiners}" id="noJoiner"/>            
+                        </apex:pageBlockSectionItem> 
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Number of Lunch Packs" for="noPack"/>
+                            <apex:inputText value="{!noPacks}" id="noPacks"/>            
+                        </apex:pageBlockSectionItem> 
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Location" for="location"/>
+                            <apex:inputText value="{!location}" id="location"/>            
+                        </apex:pageBlockSectionItem>  
+                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Date" for="date1"/>
+                            <apex:input type="date" value="{!date1}"/>
+                        </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>     
+                </apex:pageBlock>
+            </apex:form>
+        </apex:tab>
+        
+        
+        <!-- Appraisal and Promotition Email -->
+        <apex:tab label="Send Appraisal and Promotition Email" name="appraisalandPromotionEmail">
+            <apex:sectionHeader title="Send appraisal and promotition Email with attachments"/>            
+            <apex:form >
+                <apex:pageMessages />
+                <apex:pageBlock title="PDF Input">            
+                    <apex:pageBlockButtons >
+                        <apex:commandButton action="{!sendMultPdf}" value="Send PDFs"/>
+                    </apex:pageBlockButtons>            
+                    <apex:pageBlockSection >                        
+                        <apex:pageBlockSectionItem >
+                            <apex:outputLabel value="Email to be send" for="email"/>
+                            <apex:inputText value="{!email}" id="email"/>            
+                        </apex:pageBlockSectionItem>     
+                    </apex:pageBlockSection>  
+                </apex:pageBlock>
+            </apex:form>
+        </apex:tab> 
+    </apex:tabPanel>
+    
+    
+</apex:page>
