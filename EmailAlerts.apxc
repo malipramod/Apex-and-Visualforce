@@ -1,5 +1,5 @@
 public class EmailAlerts {
-    public ID accountId {get;set;}
+   public ID accountId {get;set;}
     public String email {get;set;}
     public String name {get;set;}
     public Date date1 {get;set;}
@@ -8,12 +8,38 @@ public class EmailAlerts {
     public integer noPacks {get;set;}
     public integer noJoiners {get;set;}
     public String time1 {get;set;} 
+    public String appraiseeName {get;set;} 
+    public String gender {get;set;}
+    public String month1 {get;set;}
+    public String month2 {get;set;}
+    public String year1 {get;set;}
+    public String year2 {get;set;}
+ //   public Id year1 {get;set;}
+    public List<SelectOption> statusOptions { get;set;}
+       
+            
+    
+
+    
+/*
+    public void autoRun(){
+        List<selectOption> options = new List<selectOption>();
+        integer years=System.today().year();
+        List<integer> lst=new List<integer>();
+        integer[] arr=new integer[20];
+        for(integer i=years-10;i<years+10;i++){                              
+               lst.add(i);
+        }
+        
+        options.addAll(lst);
+       // options.add(lst);
+    }*/
     
     //Intro email -information collection
     Public PageReference sendIntroEmail(){
-        Blob body;
-        Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();
-        
+         Blob body;
+		Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();
+      
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
         mail.setUseSignature(false);
         mail.setToAddresses(new String[] { email });
@@ -31,8 +57,8 @@ public class EmailAlerts {
                          ' sharing with Team Apttus.</font></i><br><br>'+
                          'I think this should give you a good idea about what your welcome email will look like.<br><br>'+
                          'Can I have this information <b>today by <b>'+time1+' please? <b>I will also need a picture.</b>'
-                        ); 
-        
+                         ); 
+       
         
         // Send the email
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
@@ -46,8 +72,8 @@ public class EmailAlerts {
     //Lunch Email
     public PageReference sendLunchEmail(){      
         Blob body;
-        Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();    
-        
+		Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();    
+       
         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
         mail.setUseSignature(false);
         mail.setToAddresses(new String[] { email });
@@ -57,7 +83,7 @@ public class EmailAlerts {
                          '<table border="1"><tr><td>Sr.No</td><td>No of Lunch Pack</td><td>Location</td></tr><tr><td>1</td><td>'+noPacks+'</td><td>'+location+'</td></tr></table>'+
                          '<br><br>Note: please coordinate with Kruti Pathak also if she is part of the any Training.'
                         ); 
-        
+       
         
         // Send the email
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
@@ -177,12 +203,304 @@ public class EmailAlerts {
         // Send the email
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
         
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));        
+        return null;        
+    }
+    
+    public PageReference reviewerList(){
+        PageReference pdf = Page.PdfGeneratorTemplate;
+        
+        
+        // the contents of the attachment from the pdf
+        Blob body;
+        
+        try {
+            
+            // returns the output of the page as a PDF
+            body = pdf.getContent();
+            
+            // need to pass unit test -- current bug  
+        } catch (VisualforceException e) {
+            body = Blob.valueOf('Some Text');
+        }
+        
+        Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();
+        attach.setContentType('application/pdf');
+        attach.setFileName('Welcome Email.pdf');
+        attach.setInline(false);
+        attach.Body = body;
+        
+        
+        
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Reviewers List');
+        mail.setHtmlBody('Hello '+name+',<br><br>We are reaching out to you in order to get the reviewers list for'+ 
+                         'your team members who are due for appraisal in this month.<br><br>'+
+                         'Please provide reviewers names in the attached sheet.<br><br><br>'+
+                         'Thanks,<br><br>HR Team'                         
+                        ); 
+        mail.setFileAttachments(new Messaging.EmailFileAttachment[] { attach }); 
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));        
+        
+        return null;
+    }
+    
+    //supervisorReview email
+    public PageReference supervisorReview(){
+        Blob body;
+        String gen;
+       // Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();    
+        if(gender=='Male'){
+             gen='Him';
+        }           
+        else{
+            gen='Her';
+        }
+            
+            
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Annual Supervisor Review for '+appraiseeName);
+        mail.setHtmlBody('Hello,<br><br>It’s that time of the year when we should review '+appraiseeName+
+                         ' accomplishments and also suggest focus areas in upcoming year.'+
+                         ' Since you worked closely with '+gen+' during the year, your feedback would be most relevant.<br><br>'+
+                         'Please click <a href="https://docs.google.com/forms/d/1F6Wudqzn_SJHAR0weRzBxrdY7Cx-IZNf9bRNYqgkAEE/viewform?c=0&w=1">here</a>'+
+                         ' to provide your feedback, latest by '+date1.format()+'.<br><br>'+
+                         'Your feedback will be anonymized, para phrased and then used in final appraisal review form.<br><br>'+
+                         '<u>Directions for filling the form:</u><br><br>'+
+                         '1) Period Covered for this appraisal:'+ month1+'-'+ year1 +' To '+ month2 +'-'+ year2 +'.<br><br>'+
+                         'If you have joined Apttus later than start date of period covered above, please provide feedback '+
+                         'based on your work experience with '+appraiseename+' since the time you Joined.<br><br>'+
+                         '2) While providing feedback, please focus on the performance, not the person.<br><br><br>'+
+                         'If you would like to talk about your views prior to filling in the form, feel free to discuss '+
+                         'that with Birju Sheth or Jesal Mehta.<br><br><br><br>'+
+                         'Thank You<br><br>Team HR'                         
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
         ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
         
         return null;
-        
-        
-        
     }
     
+  //Peer Review
+  //
+  public PageReference peerReview(){
+        Blob body;
+        String gen;
+       // Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();    
+        if(gender=='Male'){
+             gen='Him';
+        }           
+        else{
+            gen='Her';
+        }
+            
+            
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Annual Peer Review for '+appraiseeName);
+        mail.setHtmlBody('Hello,<br><br>It’s that time of the year when we should review '+appraiseeName+
+                         ' accomplishments and also suggest focus areas in upcoming year.'+
+                         ' Since you worked closely with '+gen+' during the year, your feedback would be most relevant.<br><br>'+
+                         'Please click <a href="https://docs.google.com/forms/d/1Uv1l95Q7i-0Khw1ASaGDHELo2AOpSjSFNOA56TtLfjs/viewform?c=0&w=1">here</a>'+
+                         ' to provide your feedback, latest by '+date1.format()+'.<br><br>'+
+                         'Your feedback will be anonymized, para phrased and then used in final appraisal review form.<br><br>'+
+                         '<u>Directions for filling the form:</u><br><br>'+
+                         '1) Period Covered for this appraisal:'+ month1+'-'+ year1 +' To '+ month2 +'-'+ year2 +'.<br><br>'+
+                         'If you have joined Apttus later than start date of period covered above, please provide feedback '+
+                         'based on your work experience with '+appraiseename+' since the time you Joined.<br><br>'+
+                         '2) While providing feedback, please focus on the performance, not the person.<br><br><br>'+
+                         'If you would like to talk about your views prior to filling in the form, feel free to discuss '+
+                         'that with Birju Sheth or Jesal Mehta.<br><br><br><br>'+
+                         'Thank, You<br><br>Team HR'                         
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+    }
+    
+    
+    //self Review
+    public PageReference selfReview(){
+        Blob body;   
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Annual Self Review for '+appraiseeName);
+        mail.setHtmlBody('Hi '+appraiseeName+' It’s that time of the year when we review how the past year at Apttus has been for you.'+
+                         'In the attached form, please provide your self-appraisal. Think about your accomplishments during the year and'+
+                         'areas that we need to focus on, in upcoming year.'+
+                         'Kindly send the filled in form to hrindia@apttus.com latest by '+date1.format()+'<br><br><br><br>'+
+                         'Thank, You<br><br>Team HR'                         
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+    }
+    
+    //Review List Reminder 
+    public PageReference reviewListReminder(){
+         Blob body;   
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Reminder For reviewers list -performance appraisal ');
+        mail.setHtmlBody('Hello,<br><br>This is to remind you to send us the filled in reviewers list, by '+date1.format()+' EOD. The List was '+
+                         'already sent to you and if you are not able to locate the form in your inbox, please reply to '+
+                         'hrindia@apttus.com and we will send you the list again.<br><br><br><br>'+                         
+                         'Thank, You<br><br>Team HR'                         
+                        ); 
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        return null;
+    }
+    
+    //Review review Peer Reminder
+    public PageReference reviewPeerReminder(){
+         Blob body;   
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Reminder for Annual Peer Review for '+appraiseeName);
+        mail.setHtmlBody('Hello,<br><br>This is to remind you to send us the filled in reviewers list, by '+date1.format()+' EOD. These '+
+                         'forms were already sent to you and if you are not able to locate the form in your inbox, please reply to '+
+                         'hrindia@apttus.com and we will send you the list again.<br><br><br><br>'+                         
+                         'Thank, You<br><br>Team HR'                         
+                        ); 
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        return null;
+    }
+    
+    //Review self Reminder 
+    public PageReference selfAppraisalReminder(){
+         Blob body;   
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Reminder for Self-Appraisal');
+        mail.setHtmlBody('Hello,<br><br>This is to remind you to send us the filled in reviewers list, by '+date1.format()+' EOD. These '+
+                         'forms were already sent to you and if you are not able to locate the form in your inbox, please reply to '+
+                         'hrindia@apttus.com and we will send you the list again.<br><br><br><br>'+                         
+                         'Thank You<br><br>Team HR'                         
+                        ); 
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        return null;
+    }
+    
+    //Global Peer Appraisal
+    public PageReference globalPeerAppraisal(){
+        Blob body;
+        String gen;   
+        if(gender=='Male'){
+             gen='Him';
+        }           
+        else{
+            gen='Her';
+        }
+            
+            
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Annual Peer Review for '+appraiseeName);
+        mail.setHtmlBody('Hello,<br><br>It’s that time of the year when we should review '+appraiseeName+
+                         ' accomplishments and also suggest focus areas in upcoming year.'+
+                         ' Since you worked closely with '+gen+' during the year, your feedback would be most relevant.<br><br>'+
+                         'Please click <a href="https://docs.google.com/forms/d/1Uv1l95Q7i-0Khw1ASaGDHELo2AOpSjSFNOA56TtLfjs/viewform?c=0&w=1">here</a>'+
+                         ' to provide your feedback, latest by '+date1.format()+'.<br><br>'+
+                         'Your feedback will be anonymized, para phrased and then used in final appraisal review form.<br><br>'+
+                         '<b>Please Note:</b><i>This is an interim process specific to India annual appraisals and we '+
+                         'are working with Global HR Team to integrate this to a common platform such as '+
+                         'work.com. While we do that, we would truly appreciate your time and support to help '+
+                         'us complete this activity.</i><br><br><br><br>'+
+                         '<u>Directions for filling the form:</u><br><br>'+
+                         '1) Period Covered for this appraisal:'+ month1+'-'+ year1 +' To '+ month2 +'-'+ year2 +'.<br><br>'+
+                         'If you have joined Apttus later than start date of period covered above, please provide feedback '+
+                         'based on your work experience with '+appraiseename+' since the time you Joined.<br><br>'+
+                         '2) While providing feedback, please focus on the performance, not the person.<br><br><br>'+
+                         'If you would like to talk about your views prior to filling in the form, feel free to discuss '+
+                         'that with Birju Sheth or Jesal Mehta.<br><br><br><br>'+
+                         'Thank You<br><br>Team HR'                         
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+    }
+    
+    //Global Supervisor Appraisal
+    public PageReference globalSupervisorAppraisal(){
+        Blob body;
+        String gen;   
+        if(gender=='Male'){
+             gen='Him';
+        }           
+        else{
+            gen='Her';
+        }
+            
+            
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setUseSignature(false);
+        mail.setToAddresses(new String[] { email });
+        mail.setSubject('Annual Supervisor Review for '+appraiseeName);
+        mail.setHtmlBody('Hello,<br><br>It’s that time of the year when we should review '+appraiseeName+
+                         ' accomplishments and also suggest focus areas in upcoming year.'+
+                         ' Since you worked closely with '+gen+' during the year, your feedback would be most relevant.<br><br>'+
+                         'Please click <a href="https://docs.google.com/forms/d/1F6Wudqzn_SJHAR0weRzBxrdY7Cx-IZNf9bRNYqgkAEE/viewform?c=0&w=1">here</a>'+
+                         ' to provide your feedback, latest by '+date1.format()+'.<br><br>'+
+                         'Your feedback will be anonymized, para phrased and then used in final appraisal review form.<br><br>'+
+                         '<b>Please Note:</b><i>This is an interim process specific to India annual appraisals and we '+
+                         'are working with Global HR Team to integrate this to a common platform such as '+
+                         'work.com. While we do that, we would truly appreciate your time and support to help '+
+                         'us complete this activity.</i><br><br><br><br>'+
+                         '<u>Directions for filling the form:</u><br><br>'+
+                         '1) Period Covered for this appraisal:'+ month1+'-'+ year1 +' To '+ month2 +'-'+ year2 +'.<br><br>'+
+                         'If you have joined Apttus later than start date of period covered above, please provide feedback '+
+                         'based on your work experience with '+appraiseename+' since the time you Joined.<br><br>'+
+                         '2) While providing feedback, please focus on the performance, not the person.<br><br><br>'+
+                         'If you would like to talk about your views prior to filling in the form, feel free to discuss '+
+                         'that with Birju Sheth or Jesal Mehta.<br><br><br><br>'+
+                         'Thank You<br><br>Team HR'                         
+                        ); 
+        
+        
+        // Send the email
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
+        
+        ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Email with PDF sent to '+email));
+        
+        return null;
+    }   
 }
